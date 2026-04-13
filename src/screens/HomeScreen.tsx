@@ -7,16 +7,27 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
+import { ExpenseData } from './ReviewScreen';
+import {
+  calculateTotalExpenses,
+  calculateMonthlyExpenses,
+  formatCurrency,
+  formatDate,
+} from '../utils/expenseCalculations';
 
 interface HomeScreenProps {
   onCameraPress: () => void;
-  recentExpenses: any[];
+  recentExpenses: ExpenseData[];
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   onCameraPress,
   recentExpenses,
 }) => {
+  // Calculate stats from expenses
+  const totalExpenses = calculateTotalExpenses(recentExpenses);
+  const monthlyExpenses = calculateMonthlyExpenses(recentExpenses);
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -43,11 +54,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       <View style={styles.statsSection}>
         <View style={styles.statCard}>
           <Text style={styles.statLabel}>Total Expenses</Text>
-          <Text style={styles.statValue}>$0.00</Text>
+          <Text style={styles.statValue}>{formatCurrency(totalExpenses)}</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statLabel}>This Month</Text>
-          <Text style={styles.statValue}>$0.00</Text>
+          <Text style={styles.statValue}>{formatCurrency(monthlyExpenses)}</Text>
         </View>
       </View>
 
@@ -65,9 +76,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <View key={index} style={styles.expenseItem}>
               <View style={styles.expenseInfo}>
                 <Text style={styles.merchantName}>{expense.merchant}</Text>
-                <Text style={styles.expenseDate}>{expense.date}</Text>
+                <Text style={styles.expenseDate}>{formatDate(expense.date)}</Text>
               </View>
-              <Text style={styles.expenseAmount}>${expense.total}</Text>
+              <Text style={styles.expenseAmount}>{formatCurrency(parseFloat(expense.amount))}</Text>
             </View>
           ))
         )}
