@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { CameraScreen } from './src/screens/CameraScreen';
 import { ReviewScreen, ExpenseData } from './src/screens/ReviewScreen';
+import { loadExpenses, saveExpenses } from './src/utils/storage';
 
 type AppScreen = 'home' | 'camera' | 'review';
 
@@ -12,6 +13,20 @@ export default function App() {
   const [capturedImageUri, setCapturedImageUri] = useState<string | null>(null);
   const [expenses, setExpenses] = useState<ExpenseData[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Load expenses from storage when app starts
+  useEffect(() => {
+    const initializeExpenses = async () => {
+      try {
+        const loadedExpenses = await loadExpenses();
+        setExpenses(loadedExpenses);
+      } catch (error) {
+        console.error('Failed to load expenses on startup:', error);
+      }
+    };
+
+    initializeExpenses();
+  }, []);
 
   const handlePhotoCaptured = (photoUri: string) => {
     setCapturedImageUri(photoUri);
@@ -29,8 +44,11 @@ export default function App() {
       // });
       // const result = await response.json();
 
-      // For now, just add to local state
-      setExpenses([expenseData, ...expenses]);
+      // Add to local state and save to storage
+      const updatedExpenses = [expenseData, ...expenses];
+      setExpenses(updatedExpenses);
+      await saveExpenses(updatedExpenses);
+
       setCurrentScreen('home');
       setCapturedImageUri(null);
     } catch (error) {
