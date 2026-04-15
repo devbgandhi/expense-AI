@@ -63,6 +63,23 @@ export default function App() {
     setCurrentScreen('home');
   };
 
+  const handleDeleteExpense = async (index: number) => {
+    try {
+      const updatedExpenses = expenses.filter((_, i) => i !== index);
+      setExpenses(updatedExpenses);
+      await saveExpenses(updatedExpenses);
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    }
+  };
+
+  const handleEditExpense = (expense: ExpenseData, index: number) => {
+    // Store the expense to be edited and the index
+    // For now, you could navigate to a review screen
+    // This is a placeholder for future enhancement
+    console.log('Edit expense:', expense, 'at index:', index);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -71,6 +88,8 @@ export default function App() {
         <HomeScreen
           onCameraPress={() => setCurrentScreen('camera')}
           recentExpenses={expenses.slice(0, 5)}
+          onDeleteExpense={handleDeleteExpense}
+          onEditExpense={handleEditExpense}
         />
       )}
 

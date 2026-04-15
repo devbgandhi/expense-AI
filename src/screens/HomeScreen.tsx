@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Text,
   ScrollView,
   Image,
+  Alert,
 } from 'react-native';
 import { ExpenseData } from './ReviewScreen';
 import {
@@ -18,15 +19,39 @@ import {
 interface HomeScreenProps {
   onCameraPress: () => void;
   recentExpenses: ExpenseData[];
+  onDeleteExpense?: (index: number) => void;
+  onEditExpense?: (expense: ExpenseData, index: number) => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   onCameraPress,
   recentExpenses,
+  onDeleteExpense,
+  onEditExpense,
 }) => {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
   // Calculate stats from expenses
   const totalExpenses = calculateTotalExpenses(recentExpenses);
   const monthlyExpenses = calculateMonthlyExpenses(recentExpenses);
+
+  const handleDeletePress = (index: number, merchantName: string) => {
+    Alert.alert(
+      'Delete Expense?',
+      `Are you sure you want to delete the expense from ${merchantName}?`,
+      [
+        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        {
+          text: 'Delete',
+          onPress: () => {
+            onDeleteExpense?.(index);
+            setExpandedIndex(null);
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -73,12 +98,41 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </View>
         ) : (
           recentExpenses.map((expense, index) => (
-            <View key={index} style={styles.expenseItem}>
-              <View style={styles.expenseInfo}>
-                <Text style={styles.merchantName}>{expense.merchant}</Text>
-                <Text style={styles.expenseDate}>{formatDate(expense.date)}</Text>
-              </View>
-              <Text style={styles.expenseAmount}>{formatCurrency(parseFloat(expense.amount))}</Text>
+            <View key={index}>
+              <TouchableOpacity
+                style={styles.expenseItem}
+                onPress={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.expenseInfo}>
+                  <Text style={styles.merchantName}>{expense.merchant}</Text>
+                  <Text style={styles.expenseDate}>{formatDate(expense.date)}</Text>
+                  <View style={styles.categoryBadge}>
+                    <Text style={styles.categoryBadgeText}>{expense.category}</Text>
+                  </View>
+                </View>
+                <Text style={styles.expenseAmount}>
+                  {formatCurrency(parseFloat(expense.amount))}
+                </Text>
+              </TouchableOpacity>
+
+              {/* Expanded Actions */}
+              {expandedIndex === index && (
+                <View style={styles.expenseActions}>
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.editButton]}
+                    onPress={() => onEditExpense?.(expense, index)}
+                  >
+                    <Text style={styles.actionButtonText}>✏️ Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.deleteButton]}
+                    onPress={() => handleDeletePress(index, expense.merchant)}
+                  >
+                    <Text style={styles.actionButtonText}>🗑️ Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           ))
         )}
@@ -200,10 +254,49 @@ const styles = StyleSheet.create({
     color: '#95a5a6',
     marginTop: 2,
   },
+  categoryBadge: {
+    backgroundColor: '#ecf0f1',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginTop: 6,
+    alignSelf: 'flex-start',
+  },
+  categoryBadgeText: {
+    fontSize: 11,
+    color: '#555',
+    fontWeight: '500',
+  },
   expenseAmount: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#e74c3c',
+  },
+  expenseActions: {
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    paddingBottom: 8,
+    gap: 8,
+    backgroundColor: '#f9f9f9',
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  editButton: {
+    backgroundColor: '#3498db',
+  },
+  deleteButton: {
+    backgroundColor: '#e74c3c',
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
   },
   emptyState: {
     paddingVertical: 20,
