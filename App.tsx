@@ -13,6 +13,8 @@ export default function App() {
   const [capturedImageUri, setCapturedImageUri] = useState<string | null>(null);
   const [expenses, setExpenses] = useState<ExpenseData[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<ExpenseData | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   // Load expenses from storage when app starts
   useEffect(() => {
@@ -44,13 +46,25 @@ export default function App() {
       // });
       // const result = await response.json();
 
-      // Add to local state and save to storage
-      const updatedExpenses = [expenseData, ...expenses];
+      let updatedExpenses: ExpenseData[];
+
+      // Check if we're editing or creating new
+      if (editingIndex !== null && editingIndex >= 0) {
+        // Update existing expense
+        updatedExpenses = [...expenses];
+        updatedExpenses[editingIndex] = expenseData;
+        setEditingExpense(null);
+        setEditingIndex(null);
+      } else {
+        // Add new expense
+        updatedExpenses = [expenseData, ...expenses];
+        setCapturedImageUri(null);
+      }
+
       setExpenses(updatedExpenses);
       await saveExpenses(updatedExpenses);
 
       setCurrentScreen('home');
-      setCapturedImageUri(null);
     } catch (error) {
       console.error('Error saving expense:', error);
     } finally {
@@ -60,6 +74,8 @@ export default function App() {
 
   const handleReviewCancel = () => {
     setCapturedImageUri(null);
+    setEditingExpense(null);
+    setEditingIndex(null);
     setCurrentScreen('home');
   };
 
@@ -74,10 +90,11 @@ export default function App() {
   };
 
   const handleEditExpense = (expense: ExpenseData, index: number) => {
-    // Store the expense to be edited and the index
-    // For now, you could navigate to a review screen
-    // This is a placeholder for future enhancement
-    console.log('Edit expense:', expense, 'at index:', index);
+    // Set up editing state and navigate to review screen
+    setEditingExpense(expense);
+    setEditingIndex(index);
+    setCapturedImageUri(expense.imageUri);
+    setCurrentScreen('review');
   };
 
   return (
@@ -103,6 +120,8 @@ export default function App() {
           onConfirm={handleExpenseConfirm}
           onCancel={handleReviewCancel}
           isProcessing={isProcessing}
+          existingExpense={editingExpense || undefined}
+          isEditing={editingIndex !== null}
         />
       )}
     </SafeAreaView>

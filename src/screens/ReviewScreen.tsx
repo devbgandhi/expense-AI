@@ -16,6 +16,8 @@ interface ReviewScreenProps {
   onConfirm: (data: ExpenseData) => void;
   onCancel: () => void;
   isProcessing?: boolean;
+  existingExpense?: ExpenseData;
+  isEditing?: boolean;
 }
 
 export interface ExpenseData {
@@ -33,11 +35,15 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
   onConfirm,
   onCancel,
   isProcessing = false,
+  existingExpense,
+  isEditing = false,
 }) => {
-  const [merchant, setMerchant] = useState('');
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [category, setCategory] = useState('Food');
+  const [merchant, setMerchant] = useState(existingExpense?.merchant || '');
+  const [amount, setAmount] = useState(existingExpense?.amount || '');
+  const [date, setDate] = useState(
+    existingExpense?.date || new Date().toISOString().split('T')[0]
+  );
+  const [category, setCategory] = useState(existingExpense?.category || 'Food');
 
   const handleConfirm = () => {
     if (!merchant.trim()) {
@@ -72,7 +78,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
 
       {/* Form Section */}
       <View style={styles.formSection}>
-        <Text style={styles.formTitle}>Receipt Details</Text>
+        <Text style={styles.formTitle}>{isEditing ? 'Edit Expense' : 'Receipt Details'}</Text>
 
         {/* Merchant Name */}
         <View style={styles.inputGroup}>
@@ -160,7 +166,9 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
           {isProcessing ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.confirmButtonText}>Save Expense</Text>
+            <Text style={styles.confirmButtonText}>
+              {isEditing ? 'Update Expense' : 'Save Expense'}
+            </Text>
           )}
         </TouchableOpacity>
       </View>
