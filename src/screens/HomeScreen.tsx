@@ -15,6 +15,7 @@ import {
   formatCurrency,
   formatDate,
 } from '../utils/expenseCalculations';
+import { getCategoryIcon, getCategoryColor } from '../utils/categoryIcons';
 
 interface HomeScreenProps {
   onCameraPress: () => void;
@@ -104,12 +105,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 onPress={() => setExpandedIndex(expandedIndex === index ? null : index)}
                 activeOpacity={0.7}
               >
+                <View style={[styles.categoryIconContainer, { backgroundColor: getCategoryColor(expense.category) }]}>
+                  <Text style={styles.categoryIcon}>{getCategoryIcon(expense.category)}</Text>
+                </View>
                 <View style={styles.expenseInfo}>
                   <Text style={styles.merchantName}>{expense.merchant}</Text>
                   <Text style={styles.expenseDate}>{formatDate(expense.date)}</Text>
-                  <View style={styles.categoryBadge}>
-                    <Text style={styles.categoryBadgeText}>{expense.category}</Text>
-                  </View>
                 </View>
                 <Text style={styles.expenseAmount}>
                   {formatCurrency(parseFloat(expense.amount))}
@@ -240,6 +241,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  categoryIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  categoryIcon: {
+    fontSize: 24,
   },
   expenseInfo: {
     flex: 1,

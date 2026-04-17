@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { getCategoryIcon, getCategoryColor } from '../utils/categoryIcons';
 
 interface ReviewScreenProps {
   imageUri: string;
@@ -130,10 +131,12 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
                 style={[
                   styles.categoryButton,
                   category === cat && styles.categoryButtonActive,
+                  { backgroundColor: getCategoryColor(cat), opacity: category === cat ? 1 : 0.6 },
                 ]}
                 onPress={() => setCategory(cat)}
                 disabled={isProcessing}
               >
+                <Text style={styles.categoryButtonIcon}>{getCategoryIcon(cat)}</Text>
                 <Text
                   style={[
                     styles.categoryButtonText,
@@ -238,10 +241,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#ecf0f1',
     borderWidth: 1,
     borderColor: '#bdc3c7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
   },
   categoryButtonActive: {
     backgroundColor: '#3498db',
     borderColor: '#3498db',
+  },
+  categoryButtonIcon: {
+    fontSize: 16,
+    marginBottom: 4,
   },
   categoryButtonText: {
     fontSize: 12,
