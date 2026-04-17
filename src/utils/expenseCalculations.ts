@@ -21,7 +21,7 @@ export const calculateMonthlyExpenses = (expenses: ExpenseData[]): number => {
       return total + amount;
     }
     return total;
-  }, 0);
+  }, 0); 
 };
 
 // Get expenses grouped by category with totals

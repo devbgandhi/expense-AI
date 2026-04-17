@@ -16,6 +16,7 @@ import {
   formatDate,
 } from '../utils/expenseCalculations';
 import { getCategoryIcon, getCategoryColor } from '../utils/categoryIcons';
+import { filterByCategory } from '../utils/filters';
 
 interface HomeScreenProps {
   onCameraPress: () => void;
@@ -31,10 +32,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onEditExpense,
 }) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  // Calculate stats from expenses
-  const totalExpenses = calculateTotalExpenses(recentExpenses);
-  const monthlyExpenses = calculateMonthlyExpenses(recentExpenses);
+  // Filter expenses by category
+  const filteredExpenses = filterByCategory(recentExpenses, selectedCategory);
+
+  // Calculate stats from filtered expenses
+  const totalExpenses = calculateTotalExpenses(filteredExpenses);
+  const monthlyExpenses = calculateMonthlyExpenses(filteredExpenses);
+
+  const categories = ['All', 'Food', 'Transport', 'Shopping', 'Utilities', 'Entertainment', 'Other'];
 
   const handleDeletePress = (index: number, merchantName: string) => {
     Alert.alert(
@@ -60,6 +67,31 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Expense AI</Text>
         <Text style={styles.headerSubtitle}>Track your spending smarter</Text>
+      </View>
+
+      {/* Category Filter */}
+      <View style={styles.filterSection}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.categoryButton,
+                selectedCategory === category && styles.categoryButtonActive,
+              ]}
+              onPress={() => setSelectedCategory(category)}
+            >
+              <Text
+                style={[
+                  styles.categoryButtonText,
+                  selectedCategory === category && styles.categoryButtonTextActive,
+                ]}
+              >
+                {category === 'All' ? '📊 All' : `${getCategoryIcon(category)} ${category}`}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
       {/* Main CTA Button */}
@@ -90,15 +122,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
       {/* Recent Expenses */}
       <View style={styles.recentSection}>
-        <Text style={styles.sectionTitle}>Recent Expenses</Text>
+        <Text style={styles.sectionTitle}>
+          {selectedCategory === 'All' ? 'Recent Expenses' : `${selectedCategory} Expenses`}
+        </Text>
         {recentExpenses.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
               No expenses yet. Start by capturing a receipt!
             </Text>
           </View>
+        ) : filteredExpenses.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>
+              No expenses in this category yet.
+            </Text>
+          </View>
         ) : (
-          recentExpenses.map((expense, index) => (
+          filteredExpenses.map((expense, index) => (
             <View key={index}>
               <TouchableOpacity
                 style={styles.expenseItem}
@@ -319,4 +359,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: 'italic',
   },
+  filterSection: {
+    paddingHorizontal: 12,
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  categoryScroll: {
+    flexGrow: 0,
+  },
+  categoryButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginHorizontal: 4,
+    backgroundColor: '#ecf0f1',
+    borderWidth: 1,
+    borderColor: '#bdc3c7',
+  },
+  categoryButtonActive: {
+    backgroundColor: '#3498db',
+    borderColor: '#2980b9',
+  },
+  categoryButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#555',
+  },
+  categoryButtonTextActive: {
+    color: '#fff',
+  },
 });
+
