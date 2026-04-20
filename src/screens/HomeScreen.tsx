@@ -17,6 +17,7 @@ import {
 } from '../utils/expenseCalculations';
 import { getCategoryIcon, getCategoryColor } from '../utils/categoryIcons';
 import { filterByCategory } from '../utils/filters';
+import { getSpendingTrends, getAverageDailySpending, getHighestSpendingDay } from '../utils/analytics';
 
 interface HomeScreenProps {
   onCameraPress: () => void;
@@ -40,6 +41,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   // Calculate stats from filtered expenses
   const totalExpenses = calculateTotalExpenses(filteredExpenses);
   const monthlyExpenses = calculateMonthlyExpenses(filteredExpenses);
+
+  // Get analytics data
+  const spendingTrends = getSpendingTrends(recentExpenses);
+  const averageDailySpending = getAverageDailySpending(recentExpenses);
+  const highestSpendingDay = getHighestSpendingDay(recentExpenses);
 
   const categories = ['All', 'Food', 'Transport', 'Shopping', 'Utilities', 'Entertainment', 'Other'];
 
@@ -111,14 +117,61 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* Stats Section */}
       <View style={styles.statsSection}>
         <View style={styles.statCard}>
+          <View style={styles.statIconContainer}>
+            <Text style={styles.statIcon}>💰</Text>
+          </View>
           <Text style={styles.statLabel}>Total Expenses</Text>
           <Text style={styles.statValue}>{formatCurrency(totalExpenses)}</Text>
         </View>
         <View style={styles.statCard}>
+          <View style={styles.statIconContainer}>
+            <Text style={styles.statIcon}>📅</Text>
+          </View>
           <Text style={styles.statLabel}>This Month</Text>
           <Text style={styles.statValue}>{formatCurrency(monthlyExpenses)}</Text>
         </View>
+        <View style={styles.statCard}>
+          <View style={styles.statIconContainer}>
+            <Text style={styles.statIcon}>📊</Text>
+          </View>
+          <Text style={styles.statLabel}>Daily Average</Text>
+          <Text style={styles.statValue}>{formatCurrency(averageDailySpending)}</Text>
+        </View>
       </View>
+
+      {/* Top Categories Section */}
+      {spendingTrends.length > 0 && (
+        <View style={styles.categoriesSection}>
+          <Text style={styles.sectionTitle}>Top Spending Categories</Text>
+          <View style={styles.categoryAnalytics}>
+            {spendingTrends.slice(0, 3).map((trend, index) => (
+              <View key={index} style={styles.categoryTrendItem}>
+                <View style={styles.categoryTrendHeader}>
+                  <Text style={styles.categoryTrendIcon}>
+                    {getCategoryIcon(trend.category)}
+                  </Text>
+                  <Text style={styles.categoryTrendName}>{trend.category}</Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View
+                    style={[
+                      styles.progressBar,
+                      {
+                        width: `${Math.min(trend.percentage, 100)}%`,
+                        backgroundColor: getCategoryColor(trend.category),
+                      },
+                    ]}
+                  />
+                </View>
+                <View style={styles.categoryTrendFooter}>
+                  <Text style={styles.categoryTrendAmount}>{formatCurrency(trend.total)}</Text>
+                  <Text style={styles.categoryTrendPercent}>{trend.percentage}%</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
 
       {/* Recent Expenses */}
       <View style={styles.recentSection}>
@@ -188,45 +241,55 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#3498db',
-    paddingTop: 40,
-    paddingBottom: 30,
+    backgroundColor: '#2c3e50',
+    paddingTop: 50,
+    paddingBottom: 40,
     paddingHorizontal: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: '800',
     color: '#fff',
+    letterSpacing: 0.5,
   },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#ecf0f1',
     marginTop: 4,
   },
   captureCard: {
     backgroundColor: '#fff',
     marginHorizontal: 16,
-    marginTop: 20,
-    marginBottom: 20,
-    borderRadius: 12,
-    padding: 24,
+    marginTop: 24,
+    marginBottom: 24,
+    borderRadius: 16,
+    padding: 28,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowColor: '#3498db',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: '#ecf0f1',
   },
   cameraIcon: {
     marginBottom: 12,
   },
   cameraIconText: {
-    fontSize: 40,
+    fontSize: 48,
   },
   captureCardText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#2c3e50',
     marginBottom: 4,
   },
   captureCardSubtext: {
@@ -239,29 +302,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     gap: 12,
-    marginBottom: 20,
+    marginTop: -20,
+    marginBottom: 24,
+    zIndex: 10,
   },
   statCard: {
     flex: 1,
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 3,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#7f8c8d',
-    marginBottom: 4,
+    fontSize: 13,
+    color: '#95a5a6',
+    marginBottom: 6,
+    fontWeight: '500',
   },
   statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#3498db',
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#2c3e50',
   },
   recentSection: {
     paddingHorizontal: 16,
@@ -387,6 +453,70 @@ const styles = StyleSheet.create({
   },
   categoryButtonTextActive: {
     color: '#fff',
+  },
+  statIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statIcon: {
+    fontSize: 20,
+  },
+  categoriesSection: {
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  categoryAnalytics: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    gap: 12,
+  },
+  categoryTrendItem: {
+    gap: 8,
+  },
+  categoryTrendHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  categoryTrendIcon: {
+    fontSize: 20,
+  },
+  categoryTrendName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    flex: 1,
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: '#ecf0f1',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  categoryTrendFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  categoryTrendAmount: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#555',
+  },
+  categoryTrendPercent: {
+    fontSize: 12,
+    color: '#95a5a6',
+    fontWeight: '500',
   },
 });
 
