@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   bottomContainer: {
-    backgroundColor: '#000',
+    backgroundColor: '#0f1419',
     paddingBottom: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -163,10 +163,15 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#fff',
+    backgroundColor: '#3b82f6',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 8,
   },
   captureButtonDisabled: {
     opacity: 0.5,
@@ -175,7 +180,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#2563eb',
   },
   captureText: {
     color: '#fff',
@@ -191,7 +196,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: '#000',
+    backgroundColor: '#1a1f2e',
+    borderTopWidth: 1,
+    borderTopColor: '#2a3141',
   },
   button: {
     paddingVertical: 12,
@@ -201,10 +208,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   retakeButton: {
-    backgroundColor: '#95a5a6',
+    backgroundColor: '#6b7280',
   },
   confirmButton: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#10b981',
   },
   buttonText: {
     color: '#fff',
@@ -213,12 +220,12 @@ const styles = StyleSheet.create({
   },
   permissionText: {
     fontSize: 18,
-    color: '#333',
+    color: '#e2e8f0',
     textAlign: 'center',
     marginBottom: 20,
   },
   permissionButton: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#3b82f6',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,

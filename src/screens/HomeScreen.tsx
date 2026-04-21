@@ -71,8 +71,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Expense AI</Text>
-        <Text style={styles.headerSubtitle}>Track your spending smarter</Text>
+        <Text style={styles.headerTitle}>Expenses</Text>
+        <Text style={styles.headerSubtitle}>Financial Overview</Text>
       </View>
 
       {/* Category Filter */}
@@ -93,7 +93,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   selectedCategory === category && styles.categoryButtonTextActive,
                 ]}
               >
-                {category === 'All' ? '📊 All' : `${getCategoryIcon(category)} ${category}`}
+                {category}
               </Text>
             </TouchableOpacity>
           ))}
@@ -105,12 +105,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         style={styles.captureCard}
         onPress={onCameraPress}
       >
-        <View style={styles.cameraIcon}>
-          <Text style={styles.cameraIconText}>📷</Text>
+        <View style={styles.cameraIconWrapper}>
+          <Text style={styles.cameraIconPlus}>+</Text>
         </View>
-        <Text style={styles.captureCardText}>Capture Receipt</Text>
+        <Text style={styles.captureCardText}>Add Expense</Text>
         <Text style={styles.captureCardSubtext}>
-          Scan a receipt to add an expense
+          Scan receipt or add manually
         </Text>
       </TouchableOpacity>
 
@@ -118,23 +118,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       <View style={styles.statsSection}>
         <View style={styles.statCard}>
           <View style={styles.statIconContainer}>
-            <Text style={styles.statIcon}>💰</Text>
+            <Text style={styles.statIconNumber}>$</Text>
           </View>
           <Text style={styles.statLabel}>Total Expenses</Text>
           <Text style={styles.statValue}>{formatCurrency(totalExpenses)}</Text>
         </View>
         <View style={styles.statCard}>
           <View style={styles.statIconContainer}>
-            <Text style={styles.statIcon}>📅</Text>
+            <Text style={styles.statIconNumber}>�</Text>
           </View>
           <Text style={styles.statLabel}>This Month</Text>
           <Text style={styles.statValue}>{formatCurrency(monthlyExpenses)}</Text>
         </View>
         <View style={styles.statCard}>
           <View style={styles.statIconContainer}>
-            <Text style={styles.statIcon}>📊</Text>
+            <Text style={styles.statIconNumber}>⏱</Text>
           </View>
-          <Text style={styles.statLabel}>Daily Average</Text>
+          <Text style={styles.statLabel}>Daily Avg</Text>
           <Text style={styles.statValue}>{formatCurrency(averageDailySpending)}</Text>
         </View>
       </View>
@@ -142,14 +142,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* Top Categories Section */}
       {spendingTrends.length > 0 && (
         <View style={styles.categoriesSection}>
-          <Text style={styles.sectionTitle}>Top Spending Categories</Text>
+          <Text style={styles.sectionTitle}>Top Categories</Text>
           <View style={styles.categoryAnalytics}>
             {spendingTrends.slice(0, 3).map((trend, index) => (
               <View key={index} style={styles.categoryTrendItem}>
                 <View style={styles.categoryTrendHeader}>
-                  <Text style={styles.categoryTrendIcon}>
-                    {getCategoryIcon(trend.category)}
-                  </Text>
+                  <View
+                    style={[
+                      styles.categoryBadgeIcon,
+                      { backgroundColor: getCategoryColor(trend.category) },
+                    ]}
+                  >
+                    <Text style={styles.categoryBadgeText}>{trend.category.charAt(0)}</Text>
+                  </View>
                   <Text style={styles.categoryTrendName}>{trend.category}</Text>
                 </View>
                 <View style={styles.progressBarContainer}>
@@ -199,7 +204,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 activeOpacity={0.7}
               >
                 <View style={[styles.categoryIconContainer, { backgroundColor: getCategoryColor(expense.category) }]}>
-                  <Text style={styles.categoryIcon}>{getCategoryIcon(expense.category)}</Text>
+                  <Text style={styles.categoryInitial}>{expense.category.charAt(0)}</Text>
                 </View>
                 <View style={styles.expenseInfo}>
                   <Text style={styles.merchantName}>{expense.merchant}</Text>
@@ -238,63 +243,73 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0f1419',
   },
   header: {
-    backgroundColor: '#2c3e50',
+    backgroundColor: '#1a1f2e',
     paddingTop: 50,
-    paddingBottom: 40,
+    paddingBottom: 30,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
     elevation: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2a3141',
   },
   headerTitle: {
     fontSize: 32,
-    fontWeight: '800',
+    fontWeight: '700',
     color: '#fff',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   headerSubtitle: {
-    fontSize: 15,
-    color: '#ecf0f1',
-    marginTop: 4,
+    fontSize: 14,
+    color: '#a0aec0',
+    marginTop: 6,
   },
   captureCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1f2e',
     marginHorizontal: 16,
-    marginTop: 24,
+    marginTop: 20,
     marginBottom: 24,
-    borderRadius: 16,
-    padding: 28,
+    borderRadius: 12,
+    padding: 24,
     alignItems: 'center',
-    shadowColor: '#3498db',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-    borderWidth: 2,
-    borderColor: '#ecf0f1',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#2a3141',
   },
-  cameraIcon: {
+  cameraIconWrapper: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#3b82f6',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 12,
   },
-  cameraIconText: {
-    fontSize: 48,
+  cameraIconPlus: {
+    fontSize: 32,
+    color: '#fff',
+    fontWeight: '600',
   },
   captureCardText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#2c3e50',
-    marginBottom: 4,
+    color: '#fff',
+    marginBottom: 6,
   },
   captureCardSubtext: {
     fontSize: 13,
-    color: '#7f8c8d',
+    color: '#a0aec0',
     textAlign: 'center',
   },
   statsSection: {
@@ -302,32 +317,48 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     gap: 12,
-    marginTop: -20,
+    marginTop: 0,
     marginBottom: 24,
     zIndex: 10,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: '#1a1f2e',
+    borderRadius: 12,
+    padding: 16,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#2a3141',
+  },
+  statIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: '#3b82f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statIconNumber: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
   },
   statLabel: {
-    fontSize: 13,
-    color: '#95a5a6',
+    fontSize: 12,
+    color: '#a0aec0',
     marginBottom: 6,
     fontWeight: '500',
   },
   statValue: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '800',
-    color: '#2c3e50',
+    color: '#fff',
   },
   recentSection: {
     paddingHorizontal: 16,
@@ -335,12 +366,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: '#e2e8f0',
     marginBottom: 12,
+    letterSpacing: 0.3,
   },
   expenseItem: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1f2e',
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
@@ -380,22 +412,17 @@ const styles = StyleSheet.create({
     marginTop: 6,
     alignSelf: 'flex-start',
   },
-  categoryBadgeText: {
-    fontSize: 11,
-    color: '#555',
-    fontWeight: '500',
-  },
   expenseAmount: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#e74c3c',
+    color: '#3b82f6',
   },
   expenseActions: {
     flexDirection: 'row',
     paddingHorizontal: 12,
     paddingBottom: 8,
     gap: 8,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#252d3d',
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
   },
@@ -421,60 +448,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyStateText: {
-    color: '#7f8c8d',
+    color: '#a0aec0',
     fontSize: 14,
     fontStyle: 'italic',
-  },
-  filterSection: {
-    paddingHorizontal: 12,
-    marginBottom: 16,
-    marginTop: 8,
-  },
-  categoryScroll: {
-    flexGrow: 0,
-  },
-  categoryButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginHorizontal: 4,
-    backgroundColor: '#ecf0f1',
-    borderWidth: 1,
-    borderColor: '#bdc3c7',
-  },
-  categoryButtonActive: {
-    backgroundColor: '#3498db',
-    borderColor: '#2980b9',
-  },
-  categoryButtonText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#555',
-  },
-  categoryButtonTextActive: {
-    color: '#fff',
-  },
-  statIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  statIcon: {
-    fontSize: 20,
   },
   categoriesSection: {
     paddingHorizontal: 16,
     marginBottom: 20,
   },
   categoryAnalytics: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1f2e',
     borderRadius: 12,
     padding: 16,
     gap: 12,
+    borderWidth: 1,
+    borderColor: '#2a3141',
   },
   categoryTrendItem: {
     gap: 8,
@@ -484,24 +472,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  categoryTrendIcon: {
-    fontSize: 20,
-  },
   categoryTrendName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#e2e8f0',
     flex: 1,
   },
   progressBarContainer: {
-    height: 8,
-    backgroundColor: '#ecf0f1',
-    borderRadius: 4,
+    height: 6,
+    backgroundColor: '#2a3141',
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    borderRadius: 4,
+    borderRadius: 3,
   },
   categoryTrendFooter: {
     flexDirection: 'row',
@@ -511,12 +496,58 @@ const styles = StyleSheet.create({
   categoryTrendAmount: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#555',
+    color: '#e2e8f0',
   },
   categoryTrendPercent: {
     fontSize: 12,
-    color: '#95a5a6',
+    color: '#a0aec0',
     fontWeight: '500',
+  },
+  categoryBadgeIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  categoryBadgeText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  categoryInitial: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  filterSection: {
+    paddingHorizontal: 12,
+    marginBottom: 16,
+    marginTop: 0,
+  },
+  categoryScroll: {
+    flexGrow: 0,
+  },
+  categoryButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginHorizontal: 4,
+    backgroundColor: '#2a3141',
+    borderWidth: 1,
+    borderColor: '#3b4556',
+  },
+  categoryButtonActive: {
+    backgroundColor: '#3b82f6',
+    borderColor: '#2563eb',
+  },
+  categoryButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#cbd5e1',
+  },
+  categoryButtonTextActive: {
+    color: '#fff',
   },
 });
 

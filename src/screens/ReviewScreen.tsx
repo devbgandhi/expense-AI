@@ -182,7 +182,7 @@ export const ReviewScreen: React.FC<ReviewScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0f1419',
   },
   imageContainer: {
     paddingTop: 16,
@@ -194,20 +194,24 @@ const styles = StyleSheet.create({
     height: 300,
     borderRadius: 12,
     resizeMode: 'contain',
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1f2e',
+    borderWidth: 1,
+    borderColor: '#2a3141',
   },
   formSection: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1f2e',
     paddingHorizontal: 16,
     paddingVertical: 20,
     marginHorizontal: 16,
     borderRadius: 12,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#2a3141',
   },
   formTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '700',
+    color: '#e2e8f0',
     marginBottom: 16,
   },
   inputGroup: {
@@ -216,18 +220,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#cbd5e1',
     marginBottom: 6,
   },
   input: {
-    backgroundColor: '#ecf0f1',
+    backgroundColor: '#252d3d',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 14,
-    color: '#333',
+    color: '#e2e8f0',
     borderWidth: 1,
-    borderColor: '#bdc3c7',
+    borderColor: '#3b4556',
   },
   categoryContainer: {
     flexDirection: 'row',
@@ -238,16 +242,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 6,
-    backgroundColor: '#ecf0f1',
+    backgroundColor: '#252d3d',
     borderWidth: 1,
-    borderColor: '#bdc3c7',
+    borderColor: '#3b4556',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
   },
   categoryButtonActive: {
-    backgroundColor: '#3498db',
-    borderColor: '#3498db',
+    backgroundColor: '#3b82f6',
+    borderColor: '#2563eb',
   },
   categoryButtonIcon: {
     fontSize: 16,
@@ -255,7 +259,7 @@ const styles = StyleSheet.create({
   },
   categoryButtonText: {
     fontSize: 12,
-    color: '#333',
+    color: '#cbd5e1',
     fontWeight: '500',
   },
   categoryButtonTextActive: {
@@ -279,10 +283,10 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   cancelButton: {
-    backgroundColor: '#95a5a6',
+    backgroundColor: '#6b7280',
   },
   confirmButton: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#10b981',
   },
   cancelButtonText: {
     color: '#fff',
@@ -295,3 +299,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
