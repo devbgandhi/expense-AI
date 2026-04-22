@@ -18,6 +18,7 @@ import {
 import { getCategoryIcon, getCategoryColor } from '../utils/categoryIcons';
 import { filterByCategory } from '../utils/filters';
 import { getSpendingTrends, getAverageDailySpending, getHighestSpendingDay } from '../utils/analytics';
+import { getCurrentVsPreviousMonth, getLast12MonthsData, getAverageMonthlySpending } from '../utils/monthlyComparison';
 
 interface HomeScreenProps {
   onCameraPress: () => void;
@@ -46,6 +47,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const spendingTrends = getSpendingTrends(recentExpenses);
   const averageDailySpending = getAverageDailySpending(recentExpenses);
   const highestSpendingDay = getHighestSpendingDay(recentExpenses);
+
+  // Get monthly comparison data
+  const monthlyComparison = getCurrentVsPreviousMonth(recentExpenses);
+  const last12Months = getLast12MonthsData(recentExpenses);
+  const averageMonthlySpending = getAverageMonthlySpending(recentExpenses);
 
   const categories = ['All', 'Food', 'Transport', 'Shopping', 'Utilities', 'Entertainment', 'Other'];
 
@@ -174,6 +180,58 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 </View>
               </View>
             ))}
+          </View>
+        </View>
+      )}
+
+      {/* Monthly Comparison Section */}
+      {monthlyComparison && (
+        <View style={styles.monthlyComparisonSection}>
+          <Text style={styles.sectionTitle}>Monthly Comparison</Text>
+          <View style={styles.monthlyComparisonCard}>
+            <View style={styles.monthColumn}>
+              <Text style={styles.monthLabel}>Previous Month</Text>
+              <Text style={styles.monthValue}>{formatCurrency(monthlyComparison.previous.total)}</Text>
+              <Text style={styles.monthName}>{monthlyComparison.previous.month}</Text>
+              <Text style={styles.monthCount}>{monthlyComparison.previous.count} expenses</Text>
+            </View>
+
+            <View style={styles.comparisonArrow}>
+              <View
+                style={[
+                  styles.trendIndicator,
+                  {
+                    backgroundColor:
+                      monthlyComparison.percentageChange > 0
+                        ? '#ef4444'
+                        : monthlyComparison.percentageChange < 0
+                          ? '#10b981'
+                          : '#6b7280',
+                  },
+                ]}
+              >
+                <Text style={styles.trendArrow}>
+                  {monthlyComparison.percentageChange > 0 ? '↑' : monthlyComparison.percentageChange < 0 ? '↓' : '→'}
+                </Text>
+              </View>
+              <Text style={styles.percentageChange}>{Math.abs(monthlyComparison.percentageChange)}%</Text>
+            </View>
+
+            <View style={styles.monthColumn}>
+              <Text style={styles.monthLabel}>Current Month</Text>
+              <Text style={[styles.monthValue, { color: monthlyComparison.percentageChange > 0 ? '#ef4444' : '#10b981' }]}>
+                {formatCurrency(monthlyComparison.current.total)}
+              </Text>
+              <Text style={styles.monthName}>{monthlyComparison.current.month}</Text>
+              <Text style={styles.monthCount}>{monthlyComparison.current.count} expenses</Text>
+            </View>
+          </View>
+
+          {/* Average Monthly Spending */}
+          <View style={styles.averageMonthlyCard}>
+            <Text style={styles.averageLabel}>Average Monthly Spending</Text>
+            <Text style={styles.averageValue}>{formatCurrency(averageMonthlySpending)}</Text>
+            <Text style={styles.averageSubtext}>Based on last 12 months</Text>
           </View>
         </View>
       )}
@@ -548,6 +606,94 @@ const styles = StyleSheet.create({
   },
   categoryButtonTextActive: {
     color: '#fff',
+  },
+  monthlyComparisonSection: {
+    paddingHorizontal: 16,
+    marginBottom: 24,
+  },
+  monthlyComparisonCard: {
+    backgroundColor: '#1a1f2e',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#2a3141',
+  },
+  monthColumn: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  monthLabel: {
+    fontSize: 12,
+    color: '#a0aec0',
+    marginBottom: 6,
+    fontWeight: '500',
+  },
+  monthValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#e2e8f0',
+    marginBottom: 4,
+  },
+  monthName: {
+    fontSize: 13,
+    color: '#cbd5e1',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  monthCount: {
+    fontSize: 11,
+    color: '#a0aec0',
+  },
+  comparisonArrow: {
+    flex: 0.6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  trendIndicator: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  trendArrow: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: '700',
+  },
+  percentageChange: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#e2e8f0',
+  },
+  averageMonthlyCard: {
+    backgroundColor: '#1a1f2e',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#2a3141',
+  },
+  averageLabel: {
+    fontSize: 13,
+    color: '#a0aec0',
+    marginBottom: 6,
+    fontWeight: '500',
+  },
+  averageValue: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#3b82f6',
+    marginBottom: 4,
+  },
+  averageSubtext: {
+    fontSize: 12,
+    color: '#a0aec0',
   },
 });
 
