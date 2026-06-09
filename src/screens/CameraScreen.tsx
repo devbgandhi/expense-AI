@@ -12,9 +12,16 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 
 interface CameraScreenProps {
   onPhotoCaptured: (photoUri: string) => void;
+  // optional callback invoked with parsed OCR result from backend
+  onAutoFillResult?: (data: {
+    merchant?: string | null;
+    total?: number | null;
+    date?: string | null;
+    raw_text?: string | null;
+  }) => void;
 }
 
-export const CameraScreen: React.FC<CameraScreenProps> = ({ onPhotoCaptured }) => {
+export const CameraScreen: React.FC<CameraScreenProps> = ({ onPhotoCaptured, onAutoFillResult }) => {
   const cameraRef = useRef<CameraView>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [isCapturing, setIsCapturing] = useState(false);
@@ -67,6 +74,61 @@ export const CameraScreen: React.FC<CameraScreenProps> = ({ onPhotoCaptured }) =
     }
   };
 
+  const uploadAndAutofill = async () => {
+    if (!capturedImage) return;
+
+    try {
+      // Read the file uri into a blob via fetch (works in React Native)
+      const resp = await fetch(capturedImage);
+      const blob = await resp.blob();
+
+      const form = new FormData();
+      // @ts-ignore - React Native FormData file
+      form.append('file', {
+        uri: capturedImage,
+        name: 'receipt.jpg',
+        type: blob.type || 'image/jpeg',
+      });
+
+      // Update UI while uploading
+      setIsCapturing(true);
+
+      const backendUrl = 'http://10.0.2.2:8000/process-receipt'; // default for emulator; adjust for device
+      const res = await fetch(backendUrl, {
+        method: 'POST',
+        body: form,
+        headers: {
+          // Let rn handle Content-Type + multipart boundary
+        } as any,
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        Alert.alert('OCR Error', `Server returned ${res.status}: ${txt}`);
+        return;
+      }
+
+      const json = await res.json();
+
+      // Inform parent so ReviewScreen can be pre-filled
+      onAutoFillResult && onAutoFillResult({
+        merchant: json.merchant || null,
+        total: json.total || null,
+        date: json.date || null,
+        raw_text: json.raw_text || null,
+      });
+
+      // Navigate to review by confirming photo
+      onPhotoCaptured(capturedImage);
+      setCapturedImage(null);
+    } catch (error) {
+      console.error('Upload error', error);
+      Alert.alert('Upload Failed', 'Could not send image to OCR server');
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
   const retakePhoto = () => {
     setCapturedImage(null);
   };
@@ -85,6 +147,17 @@ export const CameraScreen: React.FC<CameraScreenProps> = ({ onPhotoCaptured }) =
             onPress={retakePhoto}
           >
             <Text style={styles.buttonText}>Retake</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.autofillButton]}
+            onPress={uploadAndAutofill}
+            disabled={isCapturing}
+          >
+            {isCapturing ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Upload & Autofill</Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, styles.confirmButton]}
@@ -209,6 +282,9 @@ const styles = StyleSheet.create({
   },
   retakeButton: {
     backgroundColor: '#6b7280',
+  },
+  autofillButton: {
+    backgroundColor: '#2563eb',
   },
   confirmButton: {
     backgroundColor: '#10b981',

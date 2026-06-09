@@ -15,6 +15,7 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [editingExpense, setEditingExpense] = useState<ExpenseData | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [autoFillData, setAutoFillData] = useState<Partial<ExpenseData> | null>(null);
 
   // Load expenses from storage when app starts
   useEffect(() => {
@@ -33,6 +34,16 @@ export default function App() {
   const handlePhotoCaptured = (photoUri: string) => {
     setCapturedImageUri(photoUri);
     setCurrentScreen('review');
+  };
+
+  const handleAutoFillResult = (data: { merchant?: string | null; total?: number | null; date?: string | null; raw_text?: string | null; }) => {
+    // Prefill review form with OCR response
+    const prefill: Partial<ExpenseData> = {};
+    if (data.merchant) prefill.merchant = data.merchant;
+    if (data.total !== undefined && data.total !== null) prefill.amount = String(data.total);
+    if (data.date) prefill.date = data.date;
+
+    setAutoFillData(prefill);
   };
 
   const handleExpenseConfirm = async (expenseData: ExpenseData) => {
@@ -111,7 +122,7 @@ export default function App() {
       )}
 
       {currentScreen === 'camera' && (
-        <CameraScreen onPhotoCaptured={handlePhotoCaptured} />
+        <CameraScreen onPhotoCaptured={handlePhotoCaptured} onAutoFillResult={handleAutoFillResult} />
       )}
 
       {currentScreen === 'review' && capturedImageUri && (
@@ -120,7 +131,7 @@ export default function App() {
           onConfirm={handleExpenseConfirm}
           onCancel={handleReviewCancel}
           isProcessing={isProcessing}
-          existingExpense={editingExpense || undefined}
+          existingExpense={editingExpense || (autoFillData as ExpenseData) || undefined}
           isEditing={editingIndex !== null}
         />
       )}
