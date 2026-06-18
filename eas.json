@@ -1,0 +1,33 @@
+{
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "buildType": "simulator"
+      }
+    },
+    "preview2": {
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "buildType": "simulator"
+      }
+    },
+    "preview3": {
+      "ios": {
+        "buildType": "simulator"
+      }
+    },
+    "production": {
+      "ios": {
+        "buildType": "archive"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
