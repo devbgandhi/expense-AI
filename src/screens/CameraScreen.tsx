@@ -93,7 +93,7 @@ export const CameraScreen: React.FC<CameraScreenProps> = ({ onPhotoCaptured, onA
       // Update UI while uploading
       setIsCapturing(true);
 
-      const backendUrl = 'http://10.0.2.2:8000/process-receipt'; // default for emulator; adjust for device
+      const backendUrl = 'https://expense-ai-owpl.onrender.com/process-receipt';
       const res = await fetch(backendUrl, {
         method: 'POST',
         body: form,
