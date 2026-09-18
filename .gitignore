@@ -47,3 +47,7 @@ yarn-error.*
 /backend/*.py[cod]
 /backend/.env
 /backend/.env.local
+/backend/*.log
+
+# stray installers / large binaries
+*.pkg
